@@ -1,28 +1,43 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:learnify_task/otp_page.dart';
+import 'package:learnify_task/verification_dialog.dart';
 
-class loginPage extends StatefulWidget {
-  const loginPage({super.key});
+import 'auth_service.dart'; // Import your Firebase Authentication service
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
-  State<loginPage> createState() => _loginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _loginPageState extends State<loginPage> {
-  String selectedCountryCode = '+1';
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
-  final TextEditingController _phoneNumberController = TextEditingController();
+  void _onLogInPressed() async {
+    String email = _emailController.text;
+    String password = _passwordController.text;
 
-  void _onLogInPressed() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => OTPVerificationPage(
-          phoneNumber: _phoneNumberController.text,
-          countryCode: selectedCountryCode,
+    // Call the authentication service to sign in
+    User? user = await AuthService().signInWithEmailPassword(email, password);
+
+    if (user != null) {
+      // Authentication was successful, show the verification dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return VerificationDialog(); // Your custom dialog widget
+        },
+      );
+    } else {
+      // Authentication failed, show an error message to the user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Login failed. Please check your credentials.'),
         ),
-      ),
-    );
+      );
+    }
   }
 
   @override
@@ -87,34 +102,36 @@ class _loginPageState extends State<loginPage> {
                   ),
                   child: Row(
                     children: [
-                      DropdownButton<String>(
-                        value: selectedCountryCode,
-                        onChanged: (newValue) {
-                          setState(() {
-                            selectedCountryCode = newValue!;
-                          });
-                        },
-                        items: <String>['+1', '+44', '+91', '+86']
-                            .map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        underline: Container(),
-                      ),
                       SizedBox(width: 10.0),
                       Expanded(
                         child: TextField(
-                          controller: _phoneNumberController,
-                          keyboardType: TextInputType.phone,
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
-                            hintText: 'Phone Number',
+                            hintText: 'Email',
                             border: InputBorder.none,
                           ),
                         ),
                       ),
                     ],
+                  ),
+                ),
+                SizedBox(height: 20.0), // Add some spacing
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.05,
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  padding: EdgeInsets.symmetric(horizontal: 5.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(0.3 * screenWidth),
+                  ),
+                  child: TextField(
+                    controller: _passwordController,
+                    obscureText: true, // Hide the password
+                    decoration: InputDecoration(
+                      hintText: 'Password',
+                      border: InputBorder.none,
+                    ),
                   ),
                 ),
                 SizedBox(height: 40.0),
@@ -123,9 +140,10 @@ class _loginPageState extends State<loginPage> {
                   child: ElevatedButton(
                     onPressed: _onLogInPressed,
                     child: Container(
-                        width: MediaQuery.of(context).size.width * 0.75,
-                        alignment: Alignment.center,
-                        child: Text('Get OTP')),
+                      width: MediaQuery.of(context).size.width * 0.75,
+                      alignment: Alignment.center,
+                      child: Text('Get OTP'),
+                    ),
                     style: ElevatedButton.styleFrom(
                       primary: Colors.blue,
                       shape: RoundedRectangleBorder(
@@ -138,14 +156,15 @@ class _loginPageState extends State<loginPage> {
                   height: 40,
                 ),
                 Container(
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    child: Text(
-                      'By signing up you agree to our terms and conditions',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.grey,
-                      ),
-                    ))
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  child: Text(
+                    'By signing up you agree to our terms and conditions',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.grey,
+                    ),
+                  ),
+                )
               ],
             ),
           ),

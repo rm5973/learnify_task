@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "758821895593",
+    "project_id": "minorproj-8797d",
+    "storage_bucket": "minorproj-8797d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:758821895593:android:9c4ec21487b4c4edf418b8",
+        "android_client_info": {
+          "package_name": "com.example.learnify_task"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6r8IZDGUgbqF-dw0sRbjFTQKPpQGbgG0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
